@@ -137,7 +137,6 @@ def star_end_time(data, user_id):
                 data[user_id][item]['end']
             )
         )
-    print str(timedelta(seconds=mean(result[day]['start'])))
     for day in result:
         result[day]['start'] = average_seconds(result[day], 'start')
         result[day]['end'] = average_seconds(result[day], 'end')

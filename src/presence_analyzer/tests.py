@@ -266,7 +266,7 @@ class PresenceAnalyzerUtilsTestCase(unittest.TestCase):
         self.assertEqual(
             utils.average_seconds(
                 {'user': [1471, 277, 389, 4796, 5678]}, 'user'),
-            '0:42:02.200000'
+            '0:42:02'
         )
         self.assertEqual(
             utils.average_seconds(
