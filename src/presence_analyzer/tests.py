@@ -43,10 +43,7 @@ class PresenceAnalyzerViewsTestCase(unittest.TestCase):
         Test main page redirect.
         """
         resp = self.client.get('/')
-
-        self.assertEqual(resp.status_code, 302)
-
-        assert resp.headers['Location'].endswith('/presence_weekday.html')
+        self.assertEqual(resp.status_code, 200)
 
     def test_api_users(self):
         """
@@ -65,7 +62,6 @@ class PresenceAnalyzerViewsTestCase(unittest.TestCase):
         Test mean presence time of given user grouped by weekday.
         """
         resp = self.client.get('/api/v1/mean_time_weekday/0')
-
         self.assertEqual(resp.status_code, 404)
 
         bad_resp = self.client.get('/api/v1/mean_time_weekday/11')
@@ -89,7 +85,6 @@ class PresenceAnalyzerViewsTestCase(unittest.TestCase):
         Test by user id, for existing user and non existing user.
         """
         resp = self.client.get('/api/v1/presence_weekday/0')
-
         self.assertEqual(resp.status_code, 404)
 
         bad_resp = self.client.get('/api/v1/presence_weekday/11')
@@ -151,6 +146,16 @@ class PresenceAnalyzerViewsTestCase(unittest.TestCase):
                 },
             }
         )
+
+    def test_dynamic_route(self):
+        """
+        Testing creating dynamic routes and templates
+        """
+        resp = self.client.get('/mean_time_weekday.html')
+        self.assertEqual(resp.status_code, 200)
+
+        bad_resp = self.client.get('/something.html')
+        self.assertEqual(bad_resp.status_code, 500)
 
 
 class PresenceAnalyzerUtilsTestCase(unittest.TestCase):
@@ -260,13 +265,14 @@ class PresenceAnalyzerUtilsTestCase(unittest.TestCase):
         Test calculating average time in seconds.
         """
         self.assertEqual(
-            utils.average_seconds({'user': [1, 2, 3, 4, 5]}, 'user'),
+            utils.average_seconds(
+                {'user': [1, 2, 3, 4, 5]}, 'user'),
             '0:00:03'
         )
         self.assertEqual(
             utils.average_seconds(
                 {'user': [1471, 277, 389, 4796, 5678]}, 'user'),
-            '0:42:02.200000'
+            '0:42:02'
         )
         self.assertEqual(
             utils.average_seconds(
