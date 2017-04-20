@@ -7,8 +7,9 @@ import calendar
 import logging
 
 from flask import abort
-from flask import render_template
-from jinja2.exceptions import TemplateNotFound
+from flask import redirect
+from flask.ext.mako import render_template  # pylint: disable=no-name-in-module, import-error
+from mako.exceptions import TopLevelLookupException
 
 from main import app  # pylint: disable=relative-import
 from utils import (  # pylint: disable=relative-import
@@ -34,7 +35,7 @@ def mainpage():
     """
     Redirects to front page.
     """
-    return render_template('presence_weekday.html', pages=links)
+    return redirect('presence_weekday.html')
 
 
 @app.route('/<template>')
@@ -43,12 +44,17 @@ def dynamic_routes(template):
     Create dynamic routes and render template.
     """
     try:
+        active = links[template]
+    except KeyError:
+        active = None
+
+    try:
         return render_template(
             template,
             pages=links,
-            active=links[template]
+            active=active,
         )
-    except TemplateNotFound:
+    except TopLevelLookupException:
         abort(404)
 
 

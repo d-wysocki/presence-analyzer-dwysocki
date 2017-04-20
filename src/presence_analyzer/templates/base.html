@@ -8,29 +8,29 @@
         <meta name="author" content="STX Next sp. z o.o."/>
         <meta name="viewport" content="width=device-width; initial-scale=1.0">
 
-        <link href="{{ url_for('static', filename='css/normalize.css') }}" media="all" rel="stylesheet" type="text/css" />
-        <link href="{{ url_for('static', filename='css/main.css') }}" media="all" rel="stylesheet" type="text/css" />
+        <link href="${ url_for('static', filename='css/normalize.css') }" media="all" rel="stylesheet" type="text/css" />
+        <link href="${ url_for('static', filename='css/main.css') }" media="all" rel="stylesheet" type="text/css" />
 
-        <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
+        <script src="${ url_for('static', filename='js/jquery.min.js') }"></script>
         <script type="text/javascript" src="https://www.google.com/jsapi"></script>
-        {% block head %}{% endblock %}
+        <%block name='head'></%block>
     </head>
     <body>
         <div id="main">
             <div id="header">
                 <h1>Presence analyzer</h1>
                 <ul>
-                {%- for link, name in pages.items() -%}
+                % for link, name in pages.items():
                     <li
-                    {%- if request.url.endswith(link) %}
+                    % if request.url.endswith(link):
                         id="selected"
-                    {%- endif %}>
-                        <a href="{{ link }}">{{ name }}</a></li>
-                {%- endfor %}
+                    % endif
+                        ><a href="${ link }">${ name }</a></li>
+                % endfor
                 </ul>
             </div>
             <div id="content">
-                <h2>{{ active }}</h2>
+                <h2>${ active }</h2>
                 <p>
                     <select id="user_id" style="display: none">
                         <option value="">--</option>
@@ -38,7 +38,7 @@
                 <div id="chart_div" style="display: none">
                 </div>
                 <div id="loading">
-                    <img src="{{ url_for('static', filename='img/loading.gif') }}" />
+                    <img src="${ url_for('static', filename='img/loading.gif') }"/>
                 </div>
                 </p>
             </div>
