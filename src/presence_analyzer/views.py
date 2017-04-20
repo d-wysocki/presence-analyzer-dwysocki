@@ -7,7 +7,8 @@ import calendar
 import logging
 
 from flask import abort
-from flask import redirect
+from flask import render_template
+from jinja2.exceptions import TemplateNotFound
 
 from main import app  # pylint: disable=relative-import
 from utils import (  # pylint: disable=relative-import
@@ -18,7 +19,14 @@ from utils import (  # pylint: disable=relative-import
     mean
 )
 
+
 log = logging.getLogger(__name__)  # pylint: disable=invalid-name
+
+links = {
+    'presence_weekday.html': 'Presence by weekday',
+    'mean_time_weekday.html': 'Presence mean time',
+    'presence_start_end.html': 'Presence start-end',
+}
 
 
 @app.route('/')
@@ -26,7 +34,22 @@ def mainpage():
     """
     Redirects to front page.
     """
-    return redirect('/static/presence_weekday.html')
+    return render_template('presence_weekday.html', pages=links)
+
+
+@app.route('/<template>')
+def dynamic_routes(template):
+    """
+    Create dynamic routes and render template.
+    """
+    try:
+        return render_template(
+            template,
+            pages=links,
+            active=links[template]
+        )
+    except TemplateNotFound:
+        abort(404)
 
 
 @app.route('/api/v1/users', methods=['GET'])
