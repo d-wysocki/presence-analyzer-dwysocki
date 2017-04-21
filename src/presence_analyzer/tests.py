@@ -17,6 +17,9 @@ import views  # pylint: disable=relative-import, unused-import
 TEST_DATA_CSV = os.path.join(
     os.path.dirname(__file__), '..', '..', 'runtime', 'data', 'test_data.csv'
 )
+TEST_DATA_XML = os.path.join(
+    os.path.dirname(__file__), '..', '..', 'runtime', 'data', 'test_users.xml'
+)
 
 
 # pylint: disable=maybe-no-member, too-many-public-methods
@@ -30,6 +33,7 @@ class PresenceAnalyzerViewsTestCase(unittest.TestCase):
         Before each test, set up a environment.
         """
         main.app.config.update({'DATA_CSV': TEST_DATA_CSV})
+        main.app.config.update({'DATA_XML': TEST_DATA_XML})
         self.client = main.app.test_client()
 
     def tearDown(self):
@@ -45,7 +49,7 @@ class PresenceAnalyzerViewsTestCase(unittest.TestCase):
         resp = self.client.get('/')
         self.assertEqual(resp.status_code, 302)
 
-    def test_api_users(self):
+    def test_users_api(self):
         """
         Test users listing.
         """
@@ -55,7 +59,42 @@ class PresenceAnalyzerViewsTestCase(unittest.TestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.content_type, 'application/json')
         self.assertEqual(len(data), 2)
-        self.assertDictEqual(data[0], {u'user_id': 10, u'name': u'User 10'})
+        self.assertDictEqual(data[0], {'user_id': 10, 'name': 'User 10'})
+
+    def test_avatar_api(self):
+        """
+        Test users avatar listing.
+        """
+        resp = self.client.get('/api/v1/users_xml')
+        data = json.loads(resp.data)
+
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.content_type, 'application/json')
+        self.assertDictEqual(
+            data[0], {
+                'user_id': '176',
+                'name': 'Adrian K.',
+                'avatar': 'https://intranet.stxnext.pl/api/images/users/176'
+            }
+        )
+
+    def test_get_avatar(self):
+        """
+        Test avatar link by user id.
+        """
+        bad_resp = self.client.get('/api/v1/get_avatar/10')
+        self.assertEqual(bad_resp.status_code, 404)
+
+        resp = self.client.get('/api/v1/get_avatar/141')
+        data = json.loads(resp.data)
+
+        self.assertEqual(resp.status_code, 200)
+        self.assertDictEqual(
+            data, {
+                'user_id': 141,
+                'avatar': 'https://intranet.stxnext.pl/api/images/users/141'
+            }
+        )
 
     def test_mean_time_weekday_view(self):
         """
@@ -168,6 +207,7 @@ class PresenceAnalyzerUtilsTestCase(unittest.TestCase):
         Before each test, set up a environment.
         """
         main.app.config.update({'DATA_CSV': TEST_DATA_CSV})
+        main.app.config.update({'DATA_XML': TEST_DATA_XML})
 
     def tearDown(self):
         """
@@ -190,6 +230,21 @@ class PresenceAnalyzerUtilsTestCase(unittest.TestCase):
             data[10][sample_date]['start'],
             time(9, 39, 5)
         )
+
+    def test_get_user(self):
+        """
+        Test parsing of XML file.
+        """
+        data = utils.get_user()
+        sample_data = {
+            'name': 'Anna D.',
+            'avatar': 'https://intranet.stxnext.pl/api/images/users/165'
+        }
+
+        self.assertIsInstance(data, dict)
+        self.assertItemsEqual(data.keys(), ['176', '26', '170', '165', '141'])
+        self.assertEqual(sample_data, data['165'])
+        self.assertItemsEqual(data['165'].keys(), ['name', 'avatar'])
 
     def test_group_by_weekday(self):
         """

@@ -15,6 +15,7 @@ from main import app  # pylint: disable=relative-import
 from utils import (  # pylint: disable=relative-import
     star_end_time,
     get_data,
+    get_user,
     group_by_weekday,
     jsonify,
     mean
@@ -69,6 +70,40 @@ def users_view():
         {'user_id': i, 'name': 'User {0}'.format(str(i))}
         for i in data.keys()
     ]
+
+
+@app.route('/api/v1/users_xml', methods=['GET'])
+@jsonify
+def users_xml():
+    """
+    User listing for dropdown from xml file.
+    """
+    data = get_user()
+    return [
+        {
+            'user_id': idx,
+            'name': name['name'],
+            'avatar': name['avatar']
+        }
+        for idx, name in data.iteritems()
+    ]
+
+
+@app.route('/api/v1/get_avatar/<int:user_id>', methods=['GET'])
+@jsonify
+def get_avatar(user_id):
+    """
+    Get user avatar path by id.
+    """
+    data = get_user()
+    if str(user_id) not in data:
+        log.debug('User %s not found!', user_id)
+        abort(404)
+
+    return {
+        'user_id': user_id,
+        'avatar': data[str(user_id)]['avatar']
+    }
 
 
 @app.route('/api/v1/mean_time_weekday/<int:user_id>', methods=['GET'])
