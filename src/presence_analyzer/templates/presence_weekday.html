@@ -1,5 +1,5 @@
-{% extends "base.html" %}
+<%inherit file="base.html"/>
 
-    {% block head %}
-        <script src="{{ url_for('static', filename='js/weekday.js') }}"></script>
-    {% endblock %}
+    <%block name='head'>
+        <script type="text/javascript" src="${ url_for('static', filename='js/weekday.js') }"></script>
+    </%block>

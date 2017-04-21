@@ -1,9 +1,9 @@
-{% extends "base.html" %}
+<%inherit file="base.html"/>
 
-    {% block head %}
-        <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <%block name='head'>
         <script type="text/javascript">
             google.load("visualization", "1", {packages:["corechart"], 'language': 'pl'});
         </script>
-        <script src="{{ url_for('static', filename='js/mean_time.js') }}"></script>
-    {% endblock %}
+        <script type="text/javascript" src="${ url_for('static', filename='js/mean_time.js') }"></script>
+    </%block>
+

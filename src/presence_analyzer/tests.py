@@ -43,7 +43,7 @@ class PresenceAnalyzerViewsTestCase(unittest.TestCase):
         Test main page redirect.
         """
         resp = self.client.get('/')
-        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.status_code, 302)
 
     def test_api_users(self):
         """
@@ -155,7 +155,7 @@ class PresenceAnalyzerViewsTestCase(unittest.TestCase):
         self.assertEqual(resp.status_code, 200)
 
         bad_resp = self.client.get('/something.html')
-        self.assertEqual(bad_resp.status_code, 500)
+        self.assertEqual(bad_resp.status_code, 404)
 
 
 class PresenceAnalyzerUtilsTestCase(unittest.TestCase):
