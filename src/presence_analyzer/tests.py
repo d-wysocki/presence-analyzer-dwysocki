@@ -215,6 +215,19 @@ class PresenceAnalyzerUtilsTestCase(unittest.TestCase):
         """
         pass
 
+    def test_cache_decorator(self):
+        """
+        Test if function has wrapper.
+        """
+        self.assertTrue(getattr(utils.get_data, '__wrapped__'))
+        self.assertEqual(utils.CACHE, {})
+
+        utils.get_data()
+        self.assertIn(
+            date(2013, 9, 10),
+            utils.CACHE['get_data']['result'][10]
+        )
+
     def test_get_data(self):
         """
         Test parsing of CSV file.
