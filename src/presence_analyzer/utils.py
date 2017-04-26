@@ -9,6 +9,7 @@ import logging
 from datetime import datetime, timedelta
 from functools import wraps
 from json import dumps
+from xml.etree import ElementTree
 
 from flask import Response
 
@@ -68,7 +69,32 @@ def get_data():
                 log.debug('Problem with line %d: ', i, exc_info=True)
 
             data.setdefault(user_id, {})[date] = {'start': start, 'end': end}
+    return data
 
+
+def get_user():
+    """
+    Extracts user name and avarat from XML file and groups it by user_id.
+    """
+    with open(app.config['DATA_XML'], 'r') as xmlfile:
+        root = ElementTree.parse(xmlfile).getroot()
+
+        for item in root.iter('server'):
+            result = '{}://{}'.format(
+                item.find('protocol').text,
+                item.find('host').text
+            )
+
+        data = {
+            user.attrib['id']: {
+                'name': user.find('name').text,
+                'avatar': '{}{}'.format(
+                    result,
+                    user.find('avatar').text
+                )
+            }
+            for user in root.iter('user')
+        }
     return data
 
 
@@ -137,7 +163,6 @@ def star_end_time(data, user_id):
                 data[user_id][item]['end']
             )
         )
-    print str(timedelta(seconds=mean(result[day]['start'])))
     for day in result:
         result[day]['start'] = average_seconds(result[day], 'start')
         result[day]['end'] = average_seconds(result[day], 'end')

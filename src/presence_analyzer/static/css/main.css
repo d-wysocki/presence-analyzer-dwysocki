@@ -18,6 +18,10 @@ body {
     padding: 0 1em;
 }
 
+#avatar {
+    padding: 0 3em;
+}
+
 #chart_div {
     width: 750px;
     height: 750px;
