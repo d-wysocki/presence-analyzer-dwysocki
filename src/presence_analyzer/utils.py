@@ -5,10 +5,13 @@ Helper functions used in views.
 
 import calendar
 import csv
+import threading
 import logging
 from datetime import datetime, timedelta
+from decorator import decorator
 from functools import wraps
 from json import dumps
+from time import time
 from xml.etree import ElementTree
 
 from flask import Response
@@ -16,6 +19,7 @@ from flask import Response
 from main import app  # pylint: disable=relative-import
 
 log = logging.getLogger(__name__)  # pylint: disable=invalid-name
+CACHE = {}
 
 
 def jsonify(function):
@@ -34,6 +38,33 @@ def jsonify(function):
     return inner
 
 
+def cache(timeout):
+    """
+    Cache data from wrapped function with timeout.
+    """
+    def cached(func, *args, **kwargs):
+        """
+        Cache data wrapper.
+        """
+        lock = threading.Lock()
+        key = func.__name__
+
+        with lock:
+            if key in CACHE:
+                age = time() - CACHE[key]['time']
+                if age < timeout:
+                    return CACHE[key]['result']
+
+            result = func(*args, **kwargs)
+            CACHE[key] = {
+                'result': result,
+                'time': time()
+            }
+            return result
+    return decorator(cached)
+
+
+@cache(600)
 def get_data():
     """
     Extracts presence data from CSV file and groups it by user_id.
