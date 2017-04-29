@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
-"""Startup utilities"""
+"""
+Startup utilities
+"""
 # pylint:skip-file
 
 import os

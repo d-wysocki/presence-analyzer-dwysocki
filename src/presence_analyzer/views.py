@@ -16,6 +16,7 @@ from utils import (  # pylint: disable=relative-import
     star_end_time,
     get_data,
     get_user,
+    get_overtime,
     group_by_weekday,
     jsonify,
     mean
@@ -25,8 +26,9 @@ from utils import (  # pylint: disable=relative-import
 log = logging.getLogger(__name__)  # pylint: disable=invalid-name
 
 links = {
-    'presence_weekday.html': 'Presence by weekday',
+    'overtime.html': 'Top employees overtime',
     'mean_time_weekday.html': 'Presence mean time',
+    'presence_weekday.html': 'Presence by weekday',
     'presence_start_end.html': 'Presence start-end',
 }
 
@@ -157,3 +159,12 @@ def presence_start_end(user_id):
         log.debug('User %s not found!', user_id)
         abort(404)
     return star_end_time(data, user_id)
+
+
+@app.route('/api/v1/overtime/', methods=['GET'])
+@jsonify
+def overtime():
+    """
+    Return top users overtime.
+    """
+    return get_overtime(get_data())

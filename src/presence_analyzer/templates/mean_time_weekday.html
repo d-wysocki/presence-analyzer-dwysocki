@@ -1,8 +1,5 @@
 <%inherit file="base.html"/>
 
-    <%block name='head'>
-        <script type="text/javascript">
-            google.load("visualization", "1", {packages:["corechart"], 'language': 'pl'});
-        </script>
-        <script type="text/javascript" src="${ url_for('static', filename='js/mean_time.js') }"></script>
-    </%block>
+<%block name='head'>
+    <script src="${ url_for('static', filename='js/mean_time.js') }"></script>
+</%block>

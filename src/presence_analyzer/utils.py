@@ -7,6 +7,7 @@ import calendar
 import csv
 import threading
 import logging
+from collections import defaultdict
 from datetime import datetime, timedelta
 from decorator import decorator
 from functools import wraps
@@ -176,10 +177,7 @@ def star_end_time(data, user_id):
     Calculate average time when user start the work and when user end the work.
     """
     days_abbr = calendar.day_abbr
-    result = {
-        day: {'start': [], 'end': []}
-        for day in days_abbr
-    }
+    result = {day: {'start': [], 'end': []} for day in days_abbr}
 
     for item in data[user_id]:
         day = days_abbr[item.weekday()]
@@ -199,3 +197,69 @@ def star_end_time(data, user_id):
         result[day]['end'] = average_seconds(result[day], 'end')
 
     return result
+
+
+def bussines_days(year_month):
+    """
+    Calculate seconds of worked days in month.
+    """
+    year, month = year_month
+    date = datetime(
+        year,
+        month,
+        calendar.monthrange(year, month)[1]
+    )
+
+    return sum([
+        1 for x in xrange(1, date.day)
+        if datetime(year, month, x).weekday() < 5
+    ]) * (60 * 60 * 8)
+
+
+def get_overtime(data):
+    """
+    Calculate user overtime and sort it.
+    """
+    names = get_user()
+    result = defaultdict(dict)
+    for user in data:
+        if str(user) not in names.keys():
+            continue
+        for item in data[user]:
+            start = seconds_since_midnight(
+                data[user][item]['start']
+            )
+            end = seconds_since_midnight(
+                data[user][item]['end']
+            )
+            overtime = end - start
+            year_month = (item.year, item.month)
+
+            if user not in result or year_month not in result[user]:
+                result[user][year_month] = {'overtime': []}
+            result_overtime = result[user][year_month]['overtime']
+            result_overtime.append(overtime)
+
+        result_overtime = sum(result_overtime)
+        work_days = bussines_days(year_month)
+
+        if result_overtime > work_days:
+            finally_overtime = result_overtime - work_days
+
+            if str(user) not in names.keys():
+                continue
+            result[user] = {
+                'name': names[str(user)]['name'],
+                'overtime': finally_overtime
+            }
+        try:
+            if 'name' not in result[user][year_month]:
+                del result[user]
+        except KeyError:
+            pass
+
+    return sorted(
+        result.items(),
+        key=lambda result: result[1]['overtime'],
+        reverse=True
+    )

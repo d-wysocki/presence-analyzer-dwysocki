@@ -58,8 +58,8 @@ class PresenceAnalyzerViewsTestCase(unittest.TestCase):
 
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.content_type, 'application/json')
-        self.assertEqual(len(data), 2)
-        self.assertDictEqual(data[0], {'user_id': 10, 'name': 'User 10'})
+        self.assertEqual(len(data), 4)
+        self.assertDictEqual(data[0], {'name': 'User 176', u'user_id': 176})
 
     def test_avatar_api(self):
         """
@@ -76,6 +76,24 @@ class PresenceAnalyzerViewsTestCase(unittest.TestCase):
                 'name': 'Adrian K.',
                 'avatar': 'https://intranet.stxnext.pl/api/images/users/176'
             }
+        )
+
+    def test_overtime_api(self):
+        """
+        Testing top users overtime.
+        """
+        resp = self.client.get('/api/v1/overtime/')
+        data = json.loads(resp.data)
+
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.content_type, 'application/json')
+        self.assertEqual(
+            data, [[
+                176, {
+                    'overtime': 39586,
+                    'name': 'Adrian K.'
+                }
+            ]]
         )
 
     def test_get_avatar(self):
@@ -188,7 +206,7 @@ class PresenceAnalyzerViewsTestCase(unittest.TestCase):
 
     def test_dynamic_route(self):
         """
-        Testing creating dynamic routes and templates
+        Testing creating dynamic routes and templates.
         """
         resp = self.client.get('/mean_time_weekday.html')
         self.assertEqual(resp.status_code, 200)
@@ -223,10 +241,7 @@ class PresenceAnalyzerUtilsTestCase(unittest.TestCase):
         self.assertEqual(utils.CACHE, {})
 
         utils.get_data()
-        self.assertIn(
-            date(2013, 9, 10),
-            utils.CACHE['get_data']['result'][10]
-        )
+        self.assertIn(date(2013, 9, 10), utils.CACHE['get_data']['result'][10])
 
     def test_get_data(self):
         """
@@ -236,13 +251,10 @@ class PresenceAnalyzerUtilsTestCase(unittest.TestCase):
         sample_date = date(2013, 9, 10)
 
         self.assertIsInstance(data, dict)
-        self.assertItemsEqual(data.keys(), [10, 11])
+        self.assertItemsEqual(data.keys(), [10, 11, 141, 176])
         self.assertIn(sample_date, data[10])
         self.assertItemsEqual(data[10][sample_date].keys(), ['start', 'end'])
-        self.assertEqual(
-            data[10][sample_date]['start'],
-            time(9, 39, 5)
-        )
+        self.assertEqual(data[10][sample_date]['start'], time(9, 39, 5))
 
     def test_get_user(self):
         """
@@ -278,33 +290,20 @@ class PresenceAnalyzerUtilsTestCase(unittest.TestCase):
         """
         self.assertEqual(
             utils.seconds_since_midnight(time(2, 12, 6)),
-            timedelta(
-                hours=2,
-                minutes=12,
-                seconds=6
-            ).seconds
+            timedelta(hours=2, minutes=12, seconds=6).seconds
         )
         self.assertEqual(
             utils.seconds_since_midnight(time(12, 0, 35)),
-            timedelta(
-                hours=12,
-                minutes=0,
-                seconds=35
-            ).seconds
+            timedelta(hours=12, minutes=0, seconds=35).seconds
         )
         self.assertEqual(
             utils.seconds_since_midnight(time(1, 1, 59)),
-            timedelta(
-                hours=1,
-                minutes=1,
-                seconds=59
-            ).seconds
+            timedelta(hours=1, minutes=1, seconds=59).seconds
         )
 
     def test_interval(self):
         """
         Test calculating interval between two time objects.
-
         """
         self.assertEqual(
             25300,
@@ -418,6 +417,28 @@ class PresenceAnalyzerUtilsTestCase(unittest.TestCase):
                 },
             }
         )
+
+    def test_get_overtime(self):
+        """
+        Test get top users overtime.
+        """
+        data = utils.get_data()
+
+        self.assertEqual(
+            utils.get_overtime(data), [(
+                176, {
+                    'overtime': 39586,
+                    'name': 'Adrian K.'
+                }
+            )]
+        )
+
+    def test_bussines_day(self):
+        """
+        Test for worked seconds in month.
+        """
+        self.assertEqual(utils.bussines_days((2012, 3)), 633600)
+        self.assertEqual(utils.bussines_days((2010, 2)), 576000)
 
 
 def suite():

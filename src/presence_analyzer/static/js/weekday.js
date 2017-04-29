@@ -36,10 +36,9 @@ google.load('visualization', '1', {packages:['corechart'], 'language': 'en'});
                         $chartDiv.show();
                         $loading.hide();
                         chart.draw(data, options);
-                    })
-                        .fail(function() {
-                            alert('User not found!');
-                        });
+                    }).fail(function() {
+                        alert('User not found!');
+                    });
                 }
             });
         });
