@@ -5,11 +5,12 @@ function parseInterval(value) {
 }
 
 (function($) {
-    $(document).ready(function(){
+    $(document).ready(function() {
         var $loading = $('#loading');
 
         $.getJSON('/api/v1/users_xml', function(result) {
             var $dropdown = $('#user_id');
+
             $.each(result, function(item) {
                 $dropdown.append(
                     $('<option />', {
@@ -25,12 +26,15 @@ function parseInterval(value) {
         $('#user_id').change(function() {
             var $selectedUser = $('#user_id').val(),
                 $chartDiv = $('#chart_div');
+            if($selectedUser === '') {
+                $("#avatar").hide();
+                $chartDiv.hide();
 
-            if($selectedUser) {
+            } else {
                 $loading.show();
                 $chartDiv.hide();
 
-                $.getJSON('api/v1/get_avatar/' + $selectedUser, function(result){
+                $.getJSON('api/v1/get_avatar/' + $selectedUser, function(result) {
                     $('#avatar').attr('src', result['avatar']);
                 });
 
@@ -51,7 +55,6 @@ function parseInterval(value) {
                         ])
                     });
 
-                    // some dummy data, this should go from API
                     data.addColumn('string', 'Weekday');
                     data.addColumn({type: 'datetime', id: 'Start'});
                     data.addColumn({type: 'datetime', id: 'End'});
