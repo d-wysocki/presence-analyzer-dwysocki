@@ -1,6 +1,7 @@
+google.load("visualization", "1", {packages:["corechart"], 'language': 'pl'});
 function parseInterval(value) {
-    var result = new Date(1,1,1);
-    result.setMilliseconds(value*1000);
+    var result = new Date(0, 0, 0);
+    result.setMilliseconds(value * 1000);
     return result;
 }
 
@@ -55,10 +56,9 @@ function parseInterval(value) {
                     $chartDiv.show();
                     $loading.hide();
                     chart.draw(data, options);
-                })
-                    .fail(function() {
-                        alert('User not found!');
-                    });
+                }).fail(function() {
+                    alert('User not found!');
+                });
             }
         });
     });
