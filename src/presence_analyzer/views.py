@@ -117,7 +117,7 @@ def mean_time_weekday_view(user_id):
     data = get_data()
     if user_id not in data:
         log.debug('User %s not found!', user_id)
-        abort(404)
+        return {'404': 'User has no data'}
 
     weekdays = group_by_weekday(data[user_id])
     result = [
@@ -136,7 +136,7 @@ def presence_weekday_view(user_id):
     data = get_data()
     if user_id not in data:
         log.debug('User %s not found!', user_id)
-        abort(404)
+        return {'404': 'User has no data'}
 
     weekdays = group_by_weekday(data[user_id])
     result = [
@@ -157,7 +157,7 @@ def presence_start_end(user_id):
     data = get_data()
     if user_id not in data:
         log.debug('User %s not found!', user_id)
-        abort(404)
+        return {'404': 'User has no data'}
     return star_end_time(data, user_id)
 
 

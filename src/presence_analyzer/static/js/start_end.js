@@ -30,11 +30,17 @@ function parseInterval(value) {
                 $loading.show();
                 $chartDiv.hide();
 
-                $.getJSON('api/v1/get_avatar/' + $selectedUser, function(result){
+                $.getJSON('api/v1/get_avatar/' + $selectedUser, function(result) {
                     $('#avatar').attr('src', result['avatar']);
                 });
 
                 $.getJSON('/api/v1/presence_start_end/' + $selectedUser, function(result) {
+                    if(result[404]) {
+                        $loading.hide();
+                        $('#message').replaceWith( '<h3>' + result[404] + '</h3>' );
+                        return false;
+                    }
+
                     var finalResult = [],
                         options = {
                             hAxis: {title: 'Weekday'}
@@ -63,9 +69,7 @@ function parseInterval(value) {
                     $chartDiv.show();
                     $loading.hide();
                     chart.draw(data, options);
-                }).fail(function() {
-                    alert('User not found!');
-                });
+                })
             }
         });
     });

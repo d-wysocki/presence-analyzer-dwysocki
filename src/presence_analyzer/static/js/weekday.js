@@ -20,7 +20,8 @@ google.load('visualization', '1', {packages:['corechart'], 'language': 'en'});
                 var $selectedUser = $('#user_id').val(),
                     $chartDiv = $('#chart_div');
 
-                $.getJSON('api/v1/get_avatar/' + $selectedUser, function(result){
+                $.getJSON('api/v1/get_avatar/' + $selectedUser, function(result) {
+
                     $('#avatar').attr('src', result['avatar']);
                 });
 
@@ -29,6 +30,11 @@ google.load('visualization', '1', {packages:['corechart'], 'language': 'en'});
                     $chartDiv.hide();
 
                     $.getJSON('/api/v1/presence_weekday/' + $selectedUser, function(result) {
+                        if(result[404]) {
+                            $loading.hide();
+                            $('#message').replaceWith( '<h3>' + result[404] + '</h3>' );
+                            return false;
+                        }
                         var data = google.visualization.arrayToDataTable(result),
                             options = {},
                             chart = new google.visualization.PieChart($chartDiv[0]);
@@ -36,9 +42,7 @@ google.load('visualization', '1', {packages:['corechart'], 'language': 'en'});
                         $chartDiv.show();
                         $loading.hide();
                         chart.draw(data, options);
-                    }).fail(function() {
-                        alert('User not found!');
-                    });
+                    })
                 }
             });
         });
