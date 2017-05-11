@@ -6,12 +6,14 @@ Helper functions used in views.
 import calendar
 import csv
 import threading
+import locale
 import logging
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 from datetime import datetime, timedelta
 from decorator import decorator
 from functools import wraps
 from json import dumps
+from operator import itemgetter
 from time import time
 from xml.etree import ElementTree
 
@@ -20,6 +22,8 @@ from flask import Response
 from main import app  # pylint: disable=relative-import
 
 log = logging.getLogger(__name__)  # pylint: disable=invalid-name
+locale.setlocale(locale.LC_COLLATE, 'pl_PL.UTF-8')
+
 CACHE = {}
 
 
@@ -127,7 +131,13 @@ def get_user():
             }
             for user in root.iter('user')
         }
-    return data
+    return OrderedDict(
+        sorted(
+            data.items(),
+            key=lambda result: itemgetter('name')(itemgetter(1)(result)),
+            cmp=locale.strcoll
+        )
+    )
 
 
 def group_by_weekday(items):
