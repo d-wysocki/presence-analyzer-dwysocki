@@ -6,11 +6,12 @@ function parseInterval(value) {
 }
 
 (function($) {
-    $(document).ready(function(){
+    $(document).ready(function() {
         var $loading = $('#loading');
 
         $.getJSON('/api/v1/users_xml', function(result) {
             var $dropdown = $('#user_id');
+
             $.each(result, function(item) {
                 $dropdown.append(
                     $('<option />', {
@@ -23,20 +24,22 @@ function parseInterval(value) {
             $loading.hide();
         });
 
-        $('#user_id').change(function(){
+        $('#user_id').change(function() {
             var $selectedUser = $('#user_id').val(),
                 $chartDiv = $("#chart_div");
+            if($selectedUser === '') {
+                $("#avatar").hide();
+                $chartDiv.hide();
 
-            $.getJSON('api/v1/get_avatar/' + $selectedUser, function(result){
-                $('#avatar').attr('src', result['avatar']);
-            });
-
-            if($selectedUser) {
+            } else {
                 $loading.show();
                 $chartDiv.hide();
 
-                $.getJSON('/api/v1/mean_time_weekday/' + $selectedUser, function(result) {
+                $.getJSON('api/v1/get_avatar/' + $selectedUser, function(result) {
+                    $('#avatar').attr('src', result['avatar']);
+                });
 
+                $.getJSON('/api/v1/mean_time_weekday/' + $selectedUser, function(result) {
                     var data = new google.visualization.DataTable(),
                         options = {
                             hAxis: {title: 'Weekday'}
