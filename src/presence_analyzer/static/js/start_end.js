@@ -10,7 +10,6 @@ function parseInterval(value) {
 
         $.getJSON('/api/v1/users_xml', function(result) {
             var $dropdown = $('#user_id');
-
             $.each(result, function(item) {
                 $dropdown.append(
                     $('<option />', {
@@ -25,12 +24,14 @@ function parseInterval(value) {
 
         $('#user_id').change(function() {
             var $selectedUser = $('#user_id').val(),
-                $chartDiv = $('#chart_div');
+                $chartDiv = $('#chart_div'),
+                $message = $("#message");
             if($selectedUser === '') {
                 $("#avatar").hide();
+                $message.empty();
                 $chartDiv.hide();
-
             } else {
+                $message.empty();
                 $loading.show();
                 $chartDiv.hide();
 
@@ -39,6 +40,11 @@ function parseInterval(value) {
                 });
 
                 $.getJSON('/api/v1/presence_start_end/' + $selectedUser, function(result) {
+                    if(result['status'] === 404) {
+                        $loading.hide();
+                        $message.text(result['message']);
+                        return;
+                    }
                     var finalResult = [],
                         options = {
                             hAxis: {title: 'Weekday'}
@@ -66,9 +72,7 @@ function parseInterval(value) {
                     $chartDiv.show();
                     $loading.hide();
                     chart.draw(data, options);
-                }).fail(function() {
-                    alert('User not found!');
-                });
+                })
             }
         });
     });

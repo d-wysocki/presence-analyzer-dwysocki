@@ -118,13 +118,10 @@ class PresenceAnalyzerViewsTestCase(unittest.TestCase):
         """
         Test mean presence time of given user grouped by weekday.
         """
-        resp = self.client.get('/api/v1/mean_time_weekday/0')
-        self.assertEqual(resp.status_code, 404)
+        resp = self.client.get('/api/v1/mean_time_weekday/11')
+        data = dict(json.loads(resp.data))
 
-        bad_resp = self.client.get('/api/v1/mean_time_weekday/11')
-        data = dict(json.loads(bad_resp.data))
-
-        self.assertEqual(bad_resp.status_code, 200)
+        self.assertEqual(resp.status_code, 200)
         self.assertDictEqual(
             data, {
                 'Mon': 24123.0,
@@ -141,13 +138,10 @@ class PresenceAnalyzerViewsTestCase(unittest.TestCase):
         """
         Test by user id, for existing user and non existing user.
         """
-        resp = self.client.get('/api/v1/presence_weekday/0')
-        self.assertEqual(resp.status_code, 404)
+        resp = self.client.get('/api/v1/presence_weekday/11')
+        data = dict(json.loads(resp.data))
 
-        bad_resp = self.client.get('/api/v1/presence_weekday/11')
-        data = dict(json.loads(bad_resp.data))
-
-        self.assertEqual(bad_resp.status_code, 200)
+        self.assertEqual(resp.status_code, 200)
         self.assertDictEqual(
             data, {
                 'Weekday': 'Presence (s)',
@@ -165,13 +159,10 @@ class PresenceAnalyzerViewsTestCase(unittest.TestCase):
         """
         Test calculating average time when user start and end work.
         """
-        resp = self.client.get('/api/v1/presence_start_end/0')
-        self.assertEqual(resp.status_code, 404)
+        resp = self.client.get('/api/v1/presence_start_end/11')
+        data = dict(json.loads(resp.data))
 
-        bad_resp = self.client.get('/api/v1/presence_start_end/11')
-        data = dict(json.loads(bad_resp.data))
-
-        self.assertEqual(bad_resp.status_code, 200)
+        self.assertEqual(resp.status_code, 200)
         self.assertDictEqual(
             data, {
                 'Thu': {

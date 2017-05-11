@@ -5,7 +5,6 @@ google.load('visualization', '1', {packages:['corechart'], 'language': 'en'});
 
         $.getJSON('/api/v1/users_xml', function(result) {
             var $dropdown = $('#user_id');
-
             $.each(result, function(item) {
                 $dropdown.append(
                     $('<option />', {
@@ -19,12 +18,14 @@ google.load('visualization', '1', {packages:['corechart'], 'language': 'en'});
         });
         $('#user_id').change(function() {
             var $selectedUser = $('#user_id').val(),
-                $chartDiv = $('#chart_div');
+                $chartDiv = $('#chart_div'),
+                $message = $("#message");
             if($selectedUser === '') {
                 $("#avatar").hide();
+                $message.empty();
                 $chartDiv.hide();
-
             } else {
+                $message.empty();
                 $loading.show();
                 $chartDiv.hide();
 
@@ -33,6 +34,11 @@ google.load('visualization', '1', {packages:['corechart'], 'language': 'en'});
                 });
 
                 $.getJSON('/api/v1/presence_weekday/' + $selectedUser, function(result) {
+                    if(result['status'] === 404) {
+                        $loading.hide();
+                        $message.text(result['message']);
+                        return;
+                    }
                     var data = google.visualization.arrayToDataTable(result),
                         options = {},
                         chart = new google.visualization.PieChart($chartDiv[0]);
@@ -40,9 +46,7 @@ google.load('visualization', '1', {packages:['corechart'], 'language': 'en'});
                     $chartDiv.show();
                     $loading.hide();
                     chart.draw(data, options);
-                }).fail(function() {
-                    alert('User not found!');
-                });
+                })
             }
         });
     });
